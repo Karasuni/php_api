@@ -6,5 +6,8 @@ RewriteEngine On
 #
 # RewriteBase /
 
+# If the file with the specified name in the browser doesn't exist,
+# or the directory in the browser doesn't exist then proceed to the rewrite rule below
 RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [QSA,L]

@@ -1,6 +1,6 @@
 {
-  "name": "imec/php_test_2",
-  "description": "php API test",
+  "name": "imec/php_api",
+  "description": "PHP API test",
   "minimum-stability": "dev",
   "license": "proprietary",
   "authors": [
@@ -14,6 +14,6 @@
     "slim/slim": "^3.5"
   },
   "scripts": {
-    "start": "php -S 0.0.0.0:8080 -t public api/test.php"
+    "start": "php -S 0.0.0.0:8080 -t public public/index.php"
   }
 }
