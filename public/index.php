@@ -7,6 +7,11 @@ require __DIR__ . '/../src/database.php';
 require __DIR__ . '/../vendor/autoload.php';
 $app = new \Slim\App;
 
+///* https://github.com/itsgoingd/clockwork#slim-2 */
+//$app->add(
+//    new Clockwork\Support\Slim\ClockworkMiddleware('/requests/storage/path')
+//);
+
 /* http://www.slimframework.com/docs/cookbook/enable-cors.html */
 $app->options('/{routes:.+}', function ($request, $response, $args) { return $response; });
 
@@ -19,9 +24,10 @@ $app->add(function ($req, $res, $next) {
 });
 
 
-$app->get('/api/v1/getScore/{id}', 'apiV1:getByID');
-$app->get('/api/v1/projects', 'apiV1:getProjects');
-$app->post('/api/v1/projects/{name}', 'apiV1:addProject');
+$app->get(  '/api/v1/getScore/{id}',    'apiV1:getByID'     );
+$app->get(  '/api/v1/projects',         'apiV1:getProjects' );
+$app->get(  '/api/v1/projects/{name}',  'apiV1:getProject'  );
+$app->post( '/api/v1/projects/{name}',  'apiV1:addProject'  );
 
 class apiV1
 {
@@ -40,6 +46,7 @@ class apiV1
             $db = getDB();
 
             $sth = $db->prepare("SELECT * FROM students WHERE student_id = :id");
+            echo $sth;
             $sth->execute([':id' => $id]);
             $student = $sth->fetch(PDO::FETCH_OBJ);
 
@@ -86,6 +93,39 @@ class apiV1
         }
     }
 
+    public function getProject(Request $request, Response $response, $args) {
+
+        $projectName    = $args['name'];
+
+        try {
+            $db = getDB();
+
+            $sth = $db->prepare("SELECT * FROM projects WHERE projectName = :projectName");
+            $sth->execute([':projectName' => $projectName]);
+            $res = $sth->fetch(PDO::FETCH_OBJ);
+
+            if($res) {
+                $db = null;
+                $response
+                    ->withStatus(200)
+                    ->withHeader('Content-Type', 'application/json')
+                    ->write(json_encode($res));
+                return $response;
+            } else {
+                throw new PDOException('No records found.');
+            }
+        } catch(PDOException $e) {
+            return $response
+                ->withStatus(404)
+                ->withHeader('Content-Type', 'application/json')
+                ->write('{"error":{"text":'. json_encode($e->getMessage()) .'}}');
+        }
+    }
+
+    /*
+     * http://stackoverflow.com/questions/4976624/looping-through-all-the-properties-of-object-php
+     * Whitelist loop through object properties
+     */
     public function addProject(Request $request, Response $response, $args) {
 
         $parsedBody = $request->getParsedBody();
@@ -104,11 +144,11 @@ class apiV1
                 INSERT INTO projects (projectName, description, activity, lastModified, approvalStatus, requester)
                 VALUES (:projectName, :description, :activity, :lastModified, :approvalStatus, :requester)
                 ON DUPLICATE KEY UPDATE 
-                  description = VALUES(description),
-                  activity = VALUES(activity),
-                  lastModified = VALUES(lastModified),
-                  approvalStatus = VALUES(approvalStatus),
-                  requester = VALUES(requester)
+                  description     = VALUES(description),
+                  activity        = VALUES(activity),
+                  lastModified    = VALUES(lastModified),
+                  approvalStatus  = VALUES(approvalStatus),
+                  requester       = VALUES(requester)
             ");
 
             $sth->execute([
