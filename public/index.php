@@ -130,34 +130,74 @@ class apiV1
 
         $parsedBody = $request->getParsedBody();
 
-        $projectName    = $args['name'];
-        $description    = $parsedBody['description']    ? $parsedBody['description']    : NULL;
-        $activity       = $parsedBody['activity']       ? $parsedBody['activity']       : NULL;
-        $lastModified   = $parsedBody['lastModified']   ? $parsedBody['lastModified']   : NULL;
-        $approvalStatus = $parsedBody['approvalStatus'] ? $parsedBody['approvalStatus'] : NULL;
-        $requester      = $parsedBody['requester']      ? $parsedBody['requester']      : NULL;
+        $projectName             = $args['name'];
+        $description             = $parsedBody['description']               ; //? $parsedBody['description']                : NULL;
+        $activity                = $parsedBody['activity']                  ; //? $parsedBody['activity']                   : NULL;
+        $lastModified            = $parsedBody['lastModified']              ; //? $parsedBody['lastModified']               : NULL;
+        $approvalStatus          = $parsedBody['approvalStatus']            ; //? $parsedBody['approvalStatus']             : NULL;
+        $requester               = $parsedBody['requester']                 ; //? $parsedBody['requester']                  : NULL;
+        $responsible             = $parsedBody['responsible']               ; //? $parsedBody['responsible']                : NULL;
+        $FAB                     = $parsedBody['FAB']                       ; //? $parsedBody['FAB']                        : NULL;
+        $designSupport           = $parsedBody['designSupport']             ; //? $parsedBody['designSupport']              : NULL;
+        $preferredTimeOfDelivery = $parsedBody['preferredTimeOfDelivery']   ; //? $parsedBody['preferredTimeOfDelivery']    : NULL;
+        $preferredMaskshop       = $parsedBody['preferredMaskshop']         ; //? $parsedBody['preferredMaskshop']          : NULL;
+        $KP                      = $parsedBody['KP']                        ; //? $parsedBody['KP']                         : NULL;
+        $KD                      = $parsedBody['KD']                        ; //? $parsedBody['KD']                         : NULL;
+        $submitDate              = $parsedBody['submitDate']                ; //? $parsedBody['submitDate']                 : NULL;
+        $approval1Date           = $parsedBody['approval1Date']             ; //? $parsedBody['approval1Date']              : NULL;
+        $approval2Date           = $parsedBody['approval2Date']             ; //? $parsedBody['approval2Date']              : NULL;
+        $rejectDate              = $parsedBody['rejectDate']                ; //? $parsedBody['rejectDate']                 : NULL;
+        $typeOfWork              = $parsedBody['typeOfWork']                ; //? $parsedBody['typeOfWork']                 : NULL;
 
         try {
             $db = getDB();
 
             $sth = $db->prepare("
-                INSERT INTO projects (projectName, description, activity, lastModified, approvalStatus, requester)
-                VALUES (:projectName, :description, :activity, :lastModified, :approvalStatus, :requester)
+                INSERT INTO projects (projectName, description, activity, lastModified, approvalStatus, requester,
+                  responsible, FAB, designSupport, preferredTimeOfDelivery, preferredMaskshop, KP, KD, submitDate, approval1Date, approval2Date,
+                  rejectDate, typeOfWork)
+                VALUES (:projectName, :description, :activity, :lastModified, :approvalStatus, :requester,
+                  :responsible, :FAB, :designSupport, :preferredTimeOfDelivery, :preferredMaskshop, :KP, :KD, :submitDate, :approval1Date, :approval2Date,
+                  :rejectDate, :typeOfWork)
                 ON DUPLICATE KEY UPDATE 
-                  description     = VALUES(description),
-                  activity        = VALUES(activity),
-                  lastModified    = VALUES(lastModified),
-                  approvalStatus  = VALUES(approvalStatus),
-                  requester       = VALUES(requester)
+                  description               = VALUES(description            ),
+                  activity                  = VALUES(activity               ),
+                  lastModified              = VALUES(lastModified           ),
+                  approvalStatus            = VALUES(approvalStatus         ),
+                  requester                 = VALUES(requester              ),
+                  responsible               = VALUES(responsible            ),
+                  FAB                       = VALUES(FAB                    ),
+                  designSupport             = VALUES(designSupport          ),
+                  preferredTimeOfDelivery   = VALUES(preferredTimeOfDelivery),
+                  preferredMaskshop         = VALUES(preferredMaskshop      ),
+                  KP                        = VALUES(KP                     ),
+                  KD                        = VALUES(KD                     ),
+                  submitDate                = VALUES(submitDate             ),
+                  approval1Date             = VALUES(approval1Date          ),
+                  approval2Date             = VALUES(approval2Date          ),
+                  rejectDate                = VALUES(rejectDate             ),
+                  typeOfWork                = VALUES(typeOfWork             )
             ");
 
             $sth->execute([
-                ':projectName' => $projectName,
-                ':description' => $description,
-                ':activity' => $activity,
-                ':lastModified' => $lastModified,
-                ':approvalStatus' => $approvalStatus,
-                ':requester' => $requester
+                ':projectName'              => $projectName,
+                ':description'              => $description,
+                ':activity'                 => $activity,
+                ':lastModified'             => $lastModified,
+                ':approvalStatus'           => $approvalStatus,
+                ':requester'                => $requester,
+                ':responsible'              => $responsible,
+                ':FAB'                      => $FAB,
+                ':designSupport'            => $designSupport,
+                ':preferredTimeOfDelivery'  => $preferredTimeOfDelivery,
+                ':preferredMaskshop'        => $preferredMaskshop,
+                ':KP'                       => $KP,
+                ':KD'                       => $KD,
+                ':submitDate'               => $submitDate,
+                ':approval1Date'            => $approval1Date,
+                ':approval2Date'            => $approval2Date,
+                ':rejectDate'               => $rejectDate,
+                ':typeOfWork'               => $typeOfWork,
             ]);
 
             $db = null;
