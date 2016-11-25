@@ -5,6 +5,9 @@ RewriteEngine On
 # absolute physical path to the directory that contains this htaccess file.
 #
 # RewriteBase /
+# IMECWWW-START
+# RewriteBase /~demeye78/API/public/
+# IMECWWW-END
 
 # If the file with the specified name in the browser doesn't exist,
 # or the directory in the browser doesn't exist then proceed to the rewrite rule below

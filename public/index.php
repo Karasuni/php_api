@@ -24,7 +24,6 @@ $app->add(function ($req, $res, $next) {
 });
 
 
-$app->get(  '/api/v1/getScore/{id}',    'apiV1:getByID'     );
 $app->get(  '/api/v1/projects',         'apiV1:getProjects' );
 $app->get(  '/api/v1/projects/{name}',  'apiV1:getProject'  );
 $app->post( '/api/v1/projects/{name}',  'apiV1:addProject'  );
@@ -39,40 +38,15 @@ class apiV1
         //to access items in the container... $this->ci->get('');
     }
 
-    public function getByID(Request $request, Response $response, $args) {
-        $id = $args['id'];
-
-        try {
-            $db = getDB();
-
-            $sth = $db->prepare("SELECT * FROM students WHERE student_id = :id");
-            echo $sth;
-            $sth->execute([':id' => $id]);
-            $student = $sth->fetch(PDO::FETCH_OBJ);
-
-            if($student) {
-                $db = null;
-                $response
-                    ->withStatus(200)
-                    ->withHeader('Content-Type', 'application/json')
-                    ->write(json_encode($student));
-                return $response;
-            } else {
-                throw new PDOException('No records found.');
-            }
-        } catch(PDOException $e) {
-            return $response->withStatus(404)
-                ->withHeader('Content-Type', 'application/json')
-                ->write('{"error":{"text":'. json_encode($e->getMessage()) .'}}');
-        }
-    }
-
     public function getProjects(Request $request, Response $response, $args) {
 
         try {
             $db = getDB();
 
             $sth = $db->query("SELECT * FROM projects");
+//            IMECWWW-START
+//            $sth = $db->query("SELECT * FROM projects");
+//            IMECWWW-END
             $res = $sth->fetchAll(PDO::FETCH_OBJ);
 
             if($res) {
@@ -101,6 +75,9 @@ class apiV1
             $db = getDB();
 
             $sth = $db->prepare("SELECT * FROM projects WHERE projectName = :projectName");
+            // IMECWWW-START
+//            $sth = $db->prepare("SELECT * FROM projects_imecwww WHERE projectName = :projectName");
+            // IMECWWW-END
             $sth->execute([':projectName' => $projectName]);
             $res = $sth->fetch(PDO::FETCH_OBJ);
 
@@ -178,6 +155,34 @@ class apiV1
                   rejectDate                = VALUES(rejectDate             ),
                   typeOfWork                = VALUES(typeOfWork             )
             ");
+            // IMECWWW-START
+//            $sth = $db->prepare("
+//                INSERT INTO projects_imecwww (projectName, description, activity, lastModified, approvalStatus, requester,
+//                  responsible, FAB, designSupport, preferredTimeOfDelivery, preferredMaskshop, KP, KD, submitDate, approval1Date, approval2Date,
+//                  rejectDate, typeOfWork)
+//                VALUES (:projectName, :description, :activity, :lastModified, :approvalStatus, :requester,
+//                  :responsible, :FAB, :designSupport, :preferredTimeOfDelivery, :preferredMaskshop, :KP, :KD, :submitDate, :approval1Date, :approval2Date,
+//                  :rejectDate, :typeOfWork)
+//                ON DUPLICATE KEY UPDATE
+//                  description               = VALUES(description            ),
+//                  activity                  = VALUES(activity               ),
+//                  lastModified              = VALUES(lastModified           ),
+//                  approvalStatus            = VALUES(approvalStatus         ),
+//                  requester                 = VALUES(requester              ),
+//                  responsible               = VALUES(responsible            ),
+//                  FAB                       = VALUES(FAB                    ),
+//                  designSupport             = VALUES(designSupport          ),
+//                  preferredTimeOfDelivery   = VALUES(preferredTimeOfDelivery),
+//                  preferredMaskshop         = VALUES(preferredMaskshop      ),
+//                  KP                        = VALUES(KP                     ),
+//                  KD                        = VALUES(KD                     ),
+//                  submitDate                = VALUES(submitDate             ),
+//                  approval1Date             = VALUES(approval1Date          ),
+//                  approval2Date             = VALUES(approval2Date          ),
+//                  rejectDate                = VALUES(rejectDate             ),
+//                  typeOfWork                = VALUES(typeOfWork             )
+//            ");
+            // IMECWWW-END
 
             $sth->execute([
                 ':projectName'              => $projectName,
