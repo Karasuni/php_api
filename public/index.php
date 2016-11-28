@@ -24,11 +24,12 @@ $app->add(function ($req, $res, $next) {
 });
 
 
-$app->get(  '/api/v1/projects',         'apiV1:getProjects' );
-$app->get(  '/api/v1/projects/{name}',  'apiV1:getProject'  );
-$app->post( '/api/v1/projects/{name}',  'apiV1:addProject'  );
+$app->get(    '/api/v1/projects',         'apiV1:getProjects'   );
+$app->get(    '/api/v1/projects/{name}',  'apiV1:getProject'    );
+$app->post(   '/api/v1/projects/{name}',  'apiV1:addProject'    );
+$app->delete( '/api/v1/projects/{name}',  'apiV1:deleteProject' );
 
-class apiV1
+class apiV1 // TODO : Class per Object type w/ generic interface
 {
     protected $ci;
 
@@ -102,6 +103,12 @@ class apiV1
     /*
      * http://stackoverflow.com/questions/4976624/looping-through-all-the-properties-of-object-php
      * Whitelist loop through object properties
+     *
+     * http://www.restapitutorial.com/lessons/httpmethods.html
+     * POST
+     *  201
+     *  404 Not found
+     *  409 Conflict (already exists) ~
      */
     public function addProject(Request $request, Response $response, $args) {
 
@@ -211,6 +218,40 @@ class apiV1
 
             return $response;
         } catch(PDOException $e) {
+            return $response->withStatus(404)
+                ->withHeader('Content-Type', 'application/json')
+                ->write('{"error":{"text":'. json_encode($e->getMessage()) .'}}');
+        }
+    }
+
+    /*
+     * DELETE
+     *  200 OK
+     *  404 Not Found (id not found or invalid)
+     */
+    function deleteProject(Request $request, Response $response, $args) {
+        $projectName = $args['name'];
+
+        try {
+            $db = getDB();
+            $sth = $db->prepare("DELETE FROM projects WHERE projectName = :projectName");
+            // IMECWWW-START
+//            $sth = $db->prepare("DELETE FROM projects_imecwww WHERE projectName = :projectName");
+            // IMECWWW-END
+            $sth->execute([':projectName' => $projectName]);
+
+            if($sth) { // TODO Correct check and response (# of rows affected for example)
+                $db = null;
+                $response
+                    ->withStatus(200)
+                    ->withHeader('Content-Type', 'application/json')
+                    ->write(json_encode($sth));
+                return $response;
+            } else {
+                throw new PDOException('No records found.');
+            }
+
+        } catch (PDOException $e) {
             return $response->withStatus(404)
                 ->withHeader('Content-Type', 'application/json')
                 ->write('{"error":{"text":'. json_encode($e->getMessage()) .'}}');
