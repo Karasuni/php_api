@@ -23,11 +23,16 @@ $app->add(function ($req, $res, $next) {
         ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 });
 
-
+/* PROJECTS */
 $app->get(    '/api/v1/projects',         'apiV1:getProjects'   );
 $app->get(    '/api/v1/projects/{name}',  'apiV1:getProject'    );
 $app->post(   '/api/v1/projects/{name}',  'apiV1:addProject'    );
 $app->delete( '/api/v1/projects/{name}',  'apiV1:deleteProject' );
+
+/* FEEDBACK */
+$app->post(   '/api/v1/feedback',         'apiV1:addFeedback'   );
+$app->get(    '/api/v1/feedback',         'apiV1:getFeedback'   );
+$app->delete( '/api/v1/feedback/{id}',    'apiV1:deleteFeedback');
 
 class apiV1 // TODO : Class per Object type w/ generic interface
 {
@@ -109,6 +114,7 @@ class apiV1 // TODO : Class per Object type w/ generic interface
      *  201
      *  404 Not found
      *  409 Conflict (already exists) ~
+     * Should POST to /projects instead of /projects/:id?
      */
     public function addProject(Request $request, Response $response, $args) {
 
@@ -239,6 +245,95 @@ class apiV1 // TODO : Class per Object type w/ generic interface
 //            $sth = $db->prepare("DELETE FROM projects_imecwww WHERE projectName = :projectName");
             // IMECWWW-END
             $sth->execute([':projectName' => $projectName]);
+
+            if($sth) { // TODO Correct check and response (# of rows affected for example)
+                $db = null;
+                $response
+                    ->withStatus(200)
+                    ->withHeader('Content-Type', 'application/json')
+                    ->write(json_encode($sth));
+                return $response;
+            } else {
+                throw new PDOException('No records found.');
+            }
+
+        } catch (PDOException $e) {
+            return $response->withStatus(404)
+                ->withHeader('Content-Type', 'application/json')
+                ->write('{"error":{"text":'. json_encode($e->getMessage()) .'}}');
+        }
+    }
+
+    function addFeedback(Request $request, Response $response, $args) {
+
+        $parsedBody = $request->getParsedBody();
+
+        $userName    = $parsedBody['userName'];
+        $submitDate  = date("c");
+        $commentText = $parsedBody['commentText'];
+        // TODO DEBUG : function appears to be called twice
+
+        try {
+            $db = getDB();
+
+            $sth = $db->prepare("
+                INSERT INTO feedback (userName, submitDate, commentText)
+                VALUES (:userName, :submitDate, :commentText)
+            ");
+            $sth->execute([
+                ':userName'                 => $userName,
+                ':submitDate'               => $submitDate,
+                ':commentText'              => $commentText
+            ]);
+
+            $db = null;
+            $response
+                ->withStatus(200);
+
+            return $response;
+        } catch(PDOException $e) {
+            return $response->withStatus(404)
+                ->withHeader('Content-Type', 'application/json')
+                ->write('{"error":{"text":'. json_encode($e->getMessage()) .'}}');
+        }
+    }
+
+    function getFeedback(Request $request, Response $response, $args) {
+        try {
+            $db = getDB();
+
+            $sth = $db->query("SELECT * FROM feedback");
+            $res = $sth->fetchAll(PDO::FETCH_OBJ);
+
+            $db = null;
+            if($res) {
+                $response
+                    ->withStatus(200)
+                    ->withHeader('Content-Type', 'application/json')
+                    ->write(json_encode($res));
+                return $response;
+            } else {
+                $response
+                    ->withStatus(200)
+                    ->withHeader('Content-Type', 'application/json')
+                    ->write(json_encode([]));
+                return $response;
+            }
+        } catch(PDOException $e) {
+            return $response
+                ->withStatus(404)
+                ->withHeader('Content-Type', 'application/json')
+                ->write('{"error":{"text":'. json_encode($e->getMessage()) .'}}');
+        }
+    }
+
+    function deleteFeedback(Request $request, Response $response, $args) {
+        $id = $args['id'];
+
+        try {
+            $db = getDB();
+            $sth = $db->prepare("DELETE FROM feedback WHERE id = :id");
+            $sth->execute([':id' => $id]);
 
             if($sth) { // TODO Correct check and response (# of rows affected for example)
                 $db = null;
