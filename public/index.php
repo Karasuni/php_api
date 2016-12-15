@@ -49,9 +49,9 @@ class apiV1 // TODO : Class per Object type w/ generic interface
         try {
             $db = getDB();
 
-            $sth = $db->query("SELECT * FROM projects");
-//            IMECWWW-START
 //            $sth = $db->query("SELECT * FROM projects");
+//            IMECWWW-START
+            $sth = $db->query("SELECT * FROM projects_imecwww");
 //            IMECWWW-END
             $res = $sth->fetchAll(PDO::FETCH_OBJ);
 
@@ -80,9 +80,9 @@ class apiV1 // TODO : Class per Object type w/ generic interface
         try {
             $db = getDB();
 
-            $sth = $db->prepare("SELECT * FROM projects WHERE projectName = :projectName");
+//            $sth = $db->prepare("SELECT * FROM projects WHERE projectName = :projectName");
             // IMECWWW-START
-//            $sth = $db->prepare("SELECT * FROM projects_imecwww WHERE projectName = :projectName");
+            $sth = $db->prepare("SELECT * FROM projects_imecwww WHERE projectName = :projectName");
             // IMECWWW-END
             $sth->execute([':projectName' => $projectName]);
             $res = $sth->fetch(PDO::FETCH_OBJ);
@@ -142,35 +142,8 @@ class apiV1 // TODO : Class per Object type w/ generic interface
         try {
             $db = getDB();
 
-            $sth = $db->prepare("
-                INSERT INTO projects (projectName, description, activity, lastModified, approvalStatus, requester,
-                  responsible, FAB, designSupport, preferredTimeOfDelivery, preferredMaskshop, KP, KD, submitDate, approval1Date, approval2Date,
-                  rejectDate, typeOfWork)
-                VALUES (:projectName, :description, :activity, :lastModified, :approvalStatus, :requester,
-                  :responsible, :FAB, :designSupport, :preferredTimeOfDelivery, :preferredMaskshop, :KP, :KD, :submitDate, :approval1Date, :approval2Date,
-                  :rejectDate, :typeOfWork)
-                ON DUPLICATE KEY UPDATE 
-                  description               = VALUES(description            ),
-                  activity                  = VALUES(activity               ),
-                  lastModified              = VALUES(lastModified           ),
-                  approvalStatus            = VALUES(approvalStatus         ),
-                  requester                 = VALUES(requester              ),
-                  responsible               = VALUES(responsible            ),
-                  FAB                       = VALUES(FAB                    ),
-                  designSupport             = VALUES(designSupport          ),
-                  preferredTimeOfDelivery   = VALUES(preferredTimeOfDelivery),
-                  preferredMaskshop         = VALUES(preferredMaskshop      ),
-                  KP                        = VALUES(KP                     ),
-                  KD                        = VALUES(KD                     ),
-                  submitDate                = VALUES(submitDate             ),
-                  approval1Date             = VALUES(approval1Date          ),
-                  approval2Date             = VALUES(approval2Date          ),
-                  rejectDate                = VALUES(rejectDate             ),
-                  typeOfWork                = VALUES(typeOfWork             )
-            ");
-            // IMECWWW-START
 //            $sth = $db->prepare("
-//                INSERT INTO projects_imecwww (projectName, description, activity, lastModified, approvalStatus, requester,
+//                INSERT INTO projects (projectName, description, activity, lastModified, approvalStatus, requester,
 //                  responsible, FAB, designSupport, preferredTimeOfDelivery, preferredMaskshop, KP, KD, submitDate, approval1Date, approval2Date,
 //                  rejectDate, typeOfWork)
 //                VALUES (:projectName, :description, :activity, :lastModified, :approvalStatus, :requester,
@@ -195,6 +168,33 @@ class apiV1 // TODO : Class per Object type w/ generic interface
 //                  rejectDate                = VALUES(rejectDate             ),
 //                  typeOfWork                = VALUES(typeOfWork             )
 //            ");
+            // IMECWWW-START
+            $sth = $db->prepare("
+                INSERT INTO projects_imecwww (projectName, description, activity, lastModified, approvalStatus, requester,
+                  responsible, FAB, designSupport, preferredTimeOfDelivery, preferredMaskshop, KP, KD, submitDate, approval1Date, approval2Date,
+                  rejectDate, typeOfWork)
+                VALUES (:projectName, :description, :activity, :lastModified, :approvalStatus, :requester,
+                  :responsible, :FAB, :designSupport, :preferredTimeOfDelivery, :preferredMaskshop, :KP, :KD, :submitDate, :approval1Date, :approval2Date,
+                  :rejectDate, :typeOfWork)
+                ON DUPLICATE KEY UPDATE
+                  description               = VALUES(description            ),
+                  activity                  = VALUES(activity               ),
+                  lastModified              = VALUES(lastModified           ),
+                  approvalStatus            = VALUES(approvalStatus         ),
+                  requester                 = VALUES(requester              ),
+                  responsible               = VALUES(responsible            ),
+                  FAB                       = VALUES(FAB                    ),
+                  designSupport             = VALUES(designSupport          ),
+                  preferredTimeOfDelivery   = VALUES(preferredTimeOfDelivery),
+                  preferredMaskshop         = VALUES(preferredMaskshop      ),
+                  KP                        = VALUES(KP                     ),
+                  KD                        = VALUES(KD                     ),
+                  submitDate                = VALUES(submitDate             ),
+                  approval1Date             = VALUES(approval1Date          ),
+                  approval2Date             = VALUES(approval2Date          ),
+                  rejectDate                = VALUES(rejectDate             ),
+                  typeOfWork                = VALUES(typeOfWork             )
+            ");
             // IMECWWW-END
 
             $sth->execute([
@@ -240,9 +240,9 @@ class apiV1 // TODO : Class per Object type w/ generic interface
 
         try {
             $db = getDB();
-            $sth = $db->prepare("DELETE FROM projects WHERE projectName = :projectName");
+//            $sth = $db->prepare("DELETE FROM projects WHERE projectName = :projectName");
             // IMECWWW-START
-//            $sth = $db->prepare("DELETE FROM projects_imecwww WHERE projectName = :projectName");
+            $sth = $db->prepare("DELETE FROM projects_imecwww WHERE projectName = :projectName");
             // IMECWWW-END
             $sth->execute([':projectName' => $projectName]);
 

@@ -6,7 +6,7 @@ RewriteEngine On
 #
 # RewriteBase /
 # IMECWWW-START
-# RewriteBase /~demeye78/API/public/
+RewriteBase /~demeye78/API/public/
 # IMECWWW-END
 
 # If the file with the specified name in the browser doesn't exist,
